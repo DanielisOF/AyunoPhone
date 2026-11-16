@@ -1,6 +1,7 @@
 package cl.ortiz.ayuno
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -15,6 +16,7 @@ import androidx.glance.appwidget.LinearProgressIndicator
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.LocalContext
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
@@ -67,12 +69,13 @@ class FastWidget : GlanceAppWidget() {
 
 @Composable
 private fun Contenido(start: Long, goal: Int, now: Long) {
+    val ctx = LocalContext.current
     Column(
         modifier = GlanceModifier.fillMaxSize()
             .background(Fondo)
             .cornerRadius(20.dp)
             .padding(14.dp)
-            .clickable(actionStartActivity<MainActivity>()),
+            .clickable(actionStartActivity(Intent(ctx, MainActivity::class.java))),
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (start == 0L) {
