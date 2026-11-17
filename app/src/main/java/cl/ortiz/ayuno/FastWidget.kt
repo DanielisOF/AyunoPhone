@@ -17,6 +17,7 @@ import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.LocalContext
+import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
@@ -70,44 +71,50 @@ class FastWidget : GlanceAppWidget() {
 @Composable
 private fun Contenido(start: Long, goal: Int, now: Long) {
     val ctx = LocalContext.current
-    Column(
+    Box(
         modifier = GlanceModifier.fillMaxSize()
+            .appWidgetBackground()
             .background(Fondo)
-            .cornerRadius(20.dp)
-            .padding(14.dp)
+            .cornerRadius(16.dp)
             .clickable(actionStartActivity(Intent(ctx, MainActivity::class.java))),
-        verticalAlignment = Alignment.CenterVertically
+        contentAlignment = Alignment.Center
     ) {
-        if (start == 0L) {
-            Text("Sin ayuno activo", style = TextStyle(color = Blanco, fontSize = 15.sp, fontWeight = FontWeight.Bold))
-            Spacer(GlanceModifier.height(8.dp))
-            Box(
-                modifier = GlanceModifier.background(Boton).cornerRadius(18.dp)
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .clickable(actionRunCallback<StartFastAction>()),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Iniciar $goal h", style = TextStyle(color = Blanco, fontSize = 14.sp))
+        Column(
+            modifier = GlanceModifier.fillMaxSize().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (start == 0L) {
+                Text("Sin ayuno activo", style = TextStyle(color = Blanco, fontSize = 15.sp, fontWeight = FontWeight.Bold))
+                Spacer(GlanceModifier.height(8.dp))
+                Box(
+                    modifier = GlanceModifier.background(Boton).cornerRadius(12.dp)
+                        .padding(horizontal = 18.dp, vertical = 10.dp)
+                        .clickable(actionRunCallback<StartFastAction>()),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Iniciar $goal h", style = TextStyle(color = Blanco, fontSize = 14.sp))
+                }
+            } else {
+                val goalMs = goal * 3_600_000L
+                val elapsed = (now - start).coerceAtLeast(0L)
+                val cumplida = elapsed >= goalMs
+                val frac = (elapsed.toFloat() / goalMs).coerceIn(0f, 1f)
+                Text("Ayuno · meta $goal h", style = TextStyle(color = Gris, fontSize = 12.sp))
+                Text(hm(elapsed), style = TextStyle(color = Blanco, fontSize = 28.sp, fontWeight = FontWeight.Bold))
+                Spacer(GlanceModifier.height(4.dp))
+                LinearProgressIndicator(
+                    progress = frac,
+                    modifier = GlanceModifier.fillMaxWidth(),
+                    color = Verde,
+                    backgroundColor = Pista
+                )
+                Spacer(GlanceModifier.height(4.dp))
+                Text(
+                    if (cumplida) "¡Meta cumplida!" else "Faltan ${hm(goalMs - elapsed)}",
+                    style = TextStyle(color = if (cumplida) Verde else Blanco, fontSize = 13.sp)
+                )
             }
-        } else {
-            val goalMs = goal * 3_600_000L
-            val elapsed = (now - start).coerceAtLeast(0L)
-            val cumplida = elapsed >= goalMs
-            val frac = (elapsed.toFloat() / goalMs).coerceIn(0f, 1f)
-            Text("Ayuno · meta $goal h", style = TextStyle(color = Gris, fontSize = 12.sp))
-            Text(hm(elapsed), style = TextStyle(color = Blanco, fontSize = 28.sp, fontWeight = FontWeight.Bold))
-            Spacer(GlanceModifier.height(6.dp))
-            LinearProgressIndicator(
-                progress = frac,
-                modifier = GlanceModifier.fillMaxWidth(),
-                color = Verde,
-                backgroundColor = Pista
-            )
-            Spacer(GlanceModifier.height(6.dp))
-            Text(
-                if (cumplida) "¡Meta cumplida!" else "Faltan ${hm(goalMs - elapsed)}",
-                style = TextStyle(color = if (cumplida) Verde else Blanco, fontSize = 13.sp)
-            )
         }
     }
 }
