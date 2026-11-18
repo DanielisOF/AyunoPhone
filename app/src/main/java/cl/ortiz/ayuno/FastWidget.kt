@@ -2,6 +2,9 @@ package cl.ortiz.ayuno
 
 import android.content.Context
 import android.content.Intent
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -100,7 +103,10 @@ private fun Contenido(start: Long, goal: Int, now: Long) {
                 val elapsed = (now - start).coerceAtLeast(0L)
                 val cumplida = elapsed >= goalMs
                 val frac = (elapsed.toFloat() / goalMs).coerceIn(0f, 1f)
-                Text("Ayuno · meta $goal h", style = TextStyle(color = Gris, fontSize = 12.sp))
+                val endTime = start + goalMs
+                val fmt = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val endStr = fmt.format(Date(endTime))
+                Text("Ayuno · meta $goal h · termina $endStr", style = TextStyle(color = Gris, fontSize = 11.sp))
                 Text(hm(elapsed), style = TextStyle(color = Blanco, fontSize = 28.sp, fontWeight = FontWeight.Bold))
                 Spacer(GlanceModifier.height(4.dp))
                 LinearProgressIndicator(
@@ -111,8 +117,8 @@ private fun Contenido(start: Long, goal: Int, now: Long) {
                 )
                 Spacer(GlanceModifier.height(4.dp))
                 Text(
-                    if (cumplida) "¡Meta cumplida!" else "Faltan ${hm(goalMs - elapsed)}",
-                    style = TextStyle(color = if (cumplida) Verde else Blanco, fontSize = 13.sp)
+                    if (cumplida) "¡Meta cumplida!" else "Faltan ${hm(goalMs - elapsed)} · fin $endStr",
+                    style = TextStyle(color = if (cumplida) Verde else Blanco, fontSize = 12.sp)
                 )
             }
         }
